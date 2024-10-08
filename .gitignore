@@ -268,3 +268,4 @@ pyrightconfig.json
 .idea/
 staticfiles/*
 static/admin
+*:Zone.Identifier
