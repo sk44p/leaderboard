@@ -23,15 +23,6 @@ ALLOWED_HOSTS = ['myfbstack.pythonanywhere.com', 'www.myfbstack.com', 'localhost
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-STATIC_URL = '/static/'
-
-# Define where the collected static files will be stored (for production)
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # You can change 'staticfiles' to another directory name if needed
-
-# Define where to look for additional static files during development
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # Assuming you have a 'static' directory in your project root
-]
 
 # Application definition
 
@@ -103,11 +94,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
