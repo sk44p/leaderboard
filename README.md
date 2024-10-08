@@ -27,6 +27,10 @@ you need to create a leaderboard_app/local_settings.py file with contents that l
 ```
 SECRET_KEY = 'django-insecure-secret-123'
 
+STATIC_ROOT = "/home/myfbstack/leaderboard_app/static"
+
+STATIC_URL = '/static/'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
