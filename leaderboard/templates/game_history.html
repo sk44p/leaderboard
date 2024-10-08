@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game History</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+    <style>
+        .game-card {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .team-box {
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .team-box.red {
+            background-color: #ffdddd;
+        }
+        .team-box.yellow {
+            background-color: #fff3cd;
+        }
+        .winner {
+            border: 3px solid #00d1b2;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .score {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .player {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .mu-change {
+            font-size: 0.9rem;
+            color: #48c774; /* Green for positive */
+        }
+        .mu-change.negative {
+            color: #f14668; /* Red for negative */
+        }
+    </style>
+</head>
+<body>
+
+<section class="section">
+    <div class="container">
+        <h1 class="title has-text-centered">Game History</h1>
+
+        {% for match_data in matches %}
+        <div class="card match-card">
+            <header class="card-header">
+                <p class="card-header-title">
+                    Match played on: {{ match_data.match.created_at|date:"Y-m-d H:i" }}
+                </p>
+            </header>
+            <div class="card-content">
+                {% for game in match_data.games %}
+                <div class="columns">
+                    <div class="column">
+                        <h3 class="title is-5">Game played on: {{ game.date|date:"Y-m-d H:i" }}</h3>
+                        <p>Red Team:
+                            {% for player in game.red_team %}
+                                {{ player.name }}
+                            {% endfor %}
+                        </p>
+                        <p>Yellow Team:
+                            {% for player in game.yellow_team %}
+                                {{ player.name }}
+                            {% endfor %}
+                        </p>
+                        <p>Score: Red {{ game.score_red }} - Yellow {{ game.score_yellow }}</p>
+                        <p>Red Team Mu Changes: {{ game.red_team_mu_change }}</p>
+                        <p>Yellow Team Mu Changes: {{ game.yellow_team_mu_change }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+</body>
+</html>

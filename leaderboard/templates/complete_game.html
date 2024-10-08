@@ -1,0 +1,278 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+    <style>
+        .team-card {
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .team-card.red {
+            background-color: #ffdddd;
+            border: 2px solid #ff3860;
+        }
+        .team-card.yellow {
+            background-color: #fff3cd;
+            border: 2px solid #ffdd57;
+        }
+        .team-card.selected {
+            box-shadow: 0 0 10px 2px #00d1b2;
+            transform: translateY(0);
+        }
+        .team-card .player-list {
+            margin-top: 10px;
+        }
+        .team-card .player {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .team-card .player img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .team-card .player-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .modal-button {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body class="has-background-light">
+
+<section class="section">
+    <div class="container has-text-centered">
+        <h1 class="title">Select the Winning Team</h1>
+
+        <!-- Team Selection -->
+        <div class="columns is-centered">
+            <!-- Red Team -->
+            <div class="column is-half">
+                <div id="red-team" class="box team-card red" onclick="selectTeam('red')">
+                    <h2 class="title is-4 has-text-danger">Red Team</h2>
+                    <div class="player-list">
+                        {% for player in red_team %}
+                        <div class="player">
+                            {% if player.avatar %}
+                            <img src="{{ player.avatar.url }}" alt="{{ player.name }}'s avatar">
+                            {% else %}
+                            <img src="{% static 'images/default_avatar.png' %}" alt="Default avatar">
+                            {% endif %}
+                            <span class="player-name">{{ player.name }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Yellow Team -->
+            <div class="column is-half">
+                <div id="yellow-team" class="box team-card yellow" onclick="selectTeam('yellow')">
+                    <h2 class="title is-4 has-text-warning">Yellow Team</h2>
+                    <div class="player-list">
+                        {% for player in yellow_team %}
+                        <div class="player">
+                            {% if player.avatar %}
+                            <img src="{{ player.avatar.url }}" alt="{{ player.name }}'s avatar">
+                            {% else %}
+                            <img src="{% static 'images/default_avatar.png' %}" alt="Default avatar">
+                            {% endif %}
+                            <span class="player-name">{{ player.name }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal for entering the losing team's score -->
+<div id="score-modal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Enter Losing Team's Score</p>
+            <button class="delete" aria-label="close" onclick="closeModal()"></button>
+        </header>
+        <section class="modal-card-body has-text-centered">
+            <div class="buttons is-centered">
+                <!-- Buttons 0-9 -->
+                <button class="button modal-button" onclick="setScore(0)">0</button>
+                <button class="button modal-button" onclick="setScore(1)">1</button>
+                <button class="button modal-button" onclick="setScore(2)">2</button>
+                <button class="button modal-button" onclick="setScore(3)">3</button>
+                <button class="button modal-button" onclick="setScore(4)">4</button>
+                <button class="button modal-button" onclick="setScore(5)">5</button>
+                <button class="button modal-button" onclick="setScore(6)">6</button>
+                <button class="button modal-button" onclick="setScore(7)">7</button>
+                <button class="button modal-button" onclick="setScore(8)">8</button>
+                <button class="button modal-button" onclick="setScore(9)">9</button>
+            </div>
+        </section>
+        <footer class="modal-card-foot has-text-centered">
+            <button class="button is-success" onclick="submitScore()">Submit</button>
+        </footer>
+    </div>
+</div>
+
+<!-- Modal for rematch or return to game history -->
+<div id="rematch-modal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Rematch or Complete</p>
+            <button class="delete" aria-label="close" onclick="closeRematchModal()"></button>
+        </header>
+        <section class="modal-card-body has-text-centered">
+            <button class="button is-primary" onclick="submitRematch()">Rematch</button>
+            <button class="button is-danger" onclick="returnToGameHistory()">Complete</button>
+        </section>
+    </div>
+</div>
+
+<script>
+    let selectedTeam = null;
+    let losingScore = null;
+
+    function selectTeam(team) {
+        selectedTeam = team;
+
+        // Highlight the selected team
+        document.getElementById('red-team').classList.remove('selected');
+        document.getElementById('yellow-team').classList.remove('selected');
+
+        if (team === 'red') {
+            document.getElementById('red-team').classList.add('selected');
+        } else {
+            document.getElementById('yellow-team').classList.add('selected');
+        }
+
+        // Open modal to enter losing team's score
+        openModal();
+    }
+
+    function openModal() {
+        document.getElementById('score-modal').classList.add('is-active');
+    }
+
+    function closeModal() {
+        document.getElementById('score-modal').classList.remove('is-active');
+    }
+
+    function setScore(score) {
+        losingScore = score;
+    }
+
+    function submitScore() {
+        if (selectedTeam && losingScore !== null) {
+            // Open the rematch modal first
+            openRematchModal();
+        } else {
+            alert('Please select a score!');
+        }
+    }
+
+    function openRematchModal() {
+        document.getElementById('rematch-modal').classList.add('is-active');
+    }
+
+    function closeRematchModal() {
+        document.getElementById('rematch-modal').classList.remove('is-active');
+    }
+
+    function submitRematch() {
+        // Create a form to submit the rematch request
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{% url "complete_game" game.id %}';  // Submit to the current game URL
+
+        // CSRF token
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = 'csrfmiddlewaretoken';
+        csrfToken.value = '{{ csrf_token }}';
+
+        // Winner input
+        const winnerInput = document.createElement('input');
+        winnerInput.type = 'hidden';
+        winnerInput.name = 'winner';
+        winnerInput.value = selectedTeam;
+
+        // Losing score input
+        const loserScoreInput = document.createElement('input');
+        loserScoreInput.type = 'hidden';
+        loserScoreInput.name = 'losing_score';
+        loserScoreInput.value = losingScore;
+
+        // Add rematch input
+        const rematchInput = document.createElement('input');
+        rematchInput.type = 'hidden';
+        rematchInput.name = 'rematch';
+        rematchInput.value = '1';
+
+        // Append all inputs to the form
+        form.appendChild(csrfToken);
+        form.appendChild(winnerInput);
+        form.appendChild(loserScoreInput);
+        form.appendChild(rematchInput);
+
+        // Submit the form
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function returnToGameHistory() {
+        // Create a form to submit the return to leaderboard
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{% url "complete_game" game.id %}';  // Submit to the current game URL
+
+        // CSRF token
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = 'csrfmiddlewaretoken';
+        csrfToken.value = '{{ csrf_token }}';
+
+        // Winner input
+        const winnerInput = document.createElement('input');
+        winnerInput.type = 'hidden';
+        winnerInput.name = 'winner';
+        winnerInput.value = selectedTeam;
+
+        // Losing score input
+        const loserScoreInput = document.createElement('input');
+        loserScoreInput.type = 'hidden';
+        loserScoreInput.name = 'losing_score';
+        loserScoreInput.value = losingScore;
+
+        // Append CSRF token, winner, and losing score inputs to form
+        form.appendChild(csrfToken);
+        form.appendChild(winnerInput);
+        form.appendChild(loserScoreInput);
+
+        // Submit the form
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
+
+</body>
+</html>

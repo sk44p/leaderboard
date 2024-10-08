@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+    <style>
+        /* Container for the scrollable list of players */
+        .scrollable-player-list {
+            max-height: 60vh; /* Adjust the height based on viewport height */
+            overflow-y: auto;
+            padding-right: 15px;
+            margin-bottom: 20px; /* Space between the list and the buttons */
+        }
+        .player-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+        }
+        .player-avatar {
+            margin-right: 15px;
+        }
+        .player-info {
+            display: flex;
+            align-items: center;
+        }
+        .rank-mu-container {
+            text-align: right;
+        }
+        .rank {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .mu-change {
+            font-size: 0.9rem;
+        }
+        .mu-positive {
+            color: #48c774; /* Green for positive change */
+        }
+        .mu-negative {
+            color: #f14668; /* Red for negative change */
+        }
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="has-background-light">
+    <section class="section">
+        <div class="container">
+            <h1 class="title has-text-centered">Leaderboard</h1>
+
+            <!-- Scrollable Player List Container -->
+            <div class="scrollable-player-list">
+                <div class="box has-background-grey-lighter">
+                    {% for player_data in players %}
+                    <!-- Player Card -->
+                    <div class="player-card">
+                        <!-- Player Avatar and Info -->
+                        <div class="media-left">
+                            <div class="player-info">
+                                <!-- Player Avatar -->
+                                {% if player_data.player.avatar %}
+                                <figure class="image is-64x64 player-avatar">
+                                    <img src="{{ player_data.player.avatar.url }}" alt="{{ player_data.player.name }}'s avatar" class="is-rounded">
+                                </figure>
+                                {% else %}
+                                <figure class="image is-64x64 player-avatar">
+                                    <img src="{% static 'images/default_avatar.png' %}" alt="Default avatar" class="is-rounded">
+                                </figure>
+                                {% endif %}
+
+                                <!-- Player Name -->
+                                <div>
+                                    <p class="title is-4 player-name">{{ player_data.player.name }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rank and Mu Change (aligned to the right) -->
+                        <div class="rank-mu-container">
+                            <p class="rank">Rank: {{ player_data.player.rank|floatformat:2 }}</p>
+                            {% if player_data.mu_change is not None %}
+                            <p class="mu-change {% if player_data.mu_change >= 0 %}mu-positive{% else %}mu-negative{% endif %}">
+                                ({{ player_data.mu_change|floatformat:2 }})
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Buttons (always visible, not scrolling) -->
+            <div class="button-container">
+                <a href="{% url 'create_player' %}" class="button is-primary is-rounded is-large">Create Player</a>
+                <a href="{% url 'new_game' %}" class="button is-info is-rounded is-large">New Game</a>
+                <a href="{% url 'game_history' %}" class="button is-link is-rounded is-large">Game History</a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
+

@@ -1,0 +1,175 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+    <style>
+        .disabled-card {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .selected-red {
+            border: 3px solid #ff3860; /* Red Team Color */
+        }
+        .selected-yellow {
+            border: 3px solid #ffdd57; /* Yellow Team Color */
+        }
+        .player-card {
+            width: 100px;
+            padding: 10px;
+            text-align: center;
+            margin: 5px;
+        }
+        .player-avatar {
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+        }
+        .big-button {
+            padding: 15px 30px;
+            font-size: 1.25rem;
+        }
+        .cancel-button {
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+        .centered-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body class="has-background-light">
+    <section class="section">
+        <div class="container">
+            <h1 class="title has-text-centered">Start New Game</h1>
+
+            <!-- Form for player selection and game start -->
+            <form method="post" action="{% url 'new_game' %}">
+                {% csrf_token %}
+                <!-- Hidden inputs to store selected players -->
+                <input type="hidden" id="red-team-input" name="red_team">
+                <input type="hidden" id="yellow-team-input" name="yellow_team">
+
+                <!-- Team Selection -->
+                <div class="columns">
+                    <!-- Red Team Box -->
+                    <div class="column">
+                        <div class="box has-background-danger-light">
+                            <h2 class="title has-text-centered">Red Team</h2>
+                            <div id="red-team-players" class="columns is-multiline">
+                                {% for player in players %}
+                                <div class="column is-one-quarter">
+                                    <div class="card player-card {% if player.selected_red %}selected-red{% endif %} {% if player.disabled_red %}disabled-card{% endif %}" data-player-id="{{ player.id }}" data-team="red">
+                                        <div class="card-content centered-content">
+                                            <figure class="image player-avatar">
+                                                {% if player.avatar %}
+                                                <img src="{{ player.avatar.url }}" alt="{{ player.name }}">
+                                                {% else %}
+                                                <img src="{% static 'images/default_avatar.png' %}" alt="{{ player.name }}">
+                                                {% endif %}
+                                            </figure>
+                                            <p>{{ player.name }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Yellow Team Box -->
+                    <div class="column">
+                        <div class="box has-background-warning-light">
+                            <h2 class="title has-text-centered">Yellow Team</h2>
+                            <div id="yellow-team-players" class="columns is-multiline">
+                                {% for player in players %}
+                                <div class="column is-one-quarter">
+                                    <div class="card player-card {% if player.selected_yellow %}selected-yellow{% endif %} {% if player.disabled_yellow %}disabled-card{% endif %}" data-player-id="{{ player.id }}" data-team="yellow">
+                                        <div class="card-content centered-content">
+                                            <figure class="image player-avatar">
+                                                {% if player.avatar %}
+                                                <img src="{{ player.avatar.url }}" alt="{{ player.name }}">
+                                                {% else %}
+                                                <img src="{% static 'images/default_avatar.png' %}" alt="{{ player.name }}">
+                                                {% endif %}
+                                            </figure>
+                                            <p>{{ player.name }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons Section -->
+                <div class="buttons has-text-centered mt-5">
+                    <!-- Large Start Game Button -->
+                    <button type="submit" class="button is-primary is-rounded big-button">Start Game</button>
+
+                    <!-- Small Cancel Button -->
+                    <a href="javascript:history.back()" class="button is-danger is-rounded cancel-button mt-2">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Script for managing player selection and adding hidden inputs -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const redTeamPlayers = document.querySelectorAll('#red-team-players .player-card');
+            const yellowTeamPlayers = document.querySelectorAll('#yellow-team-players .player-card');
+            const redTeamInput = document.getElementById('red-team-input');
+            const yellowTeamInput = document.getElementById('yellow-team-input');
+
+            const redTeamSelected = [];
+            const yellowTeamSelected = [];
+
+            function findMatchingPlayer(playerId, teamPlayers) {
+                return [...teamPlayers].find(player => player.dataset.playerId === playerId);
+            }
+
+            function toggleSelection(playerCard, teamColor) {
+                const opposingTeamPlayers = teamColor === 'red' ? yellowTeamPlayers : redTeamPlayers;
+                const selectedTeam = teamColor === 'red' ? redTeamSelected : yellowTeamSelected;
+                const opposingTeamInput = teamColor === 'red' ? yellowTeamInput : redTeamInput;
+                const playerId = playerCard.dataset.playerId;
+
+                playerCard.addEventListener('click', function() {
+                    const selectedClass = teamColor === 'red' ? 'selected-red' : 'selected-yellow';
+
+                    if (playerCard.classList.contains(selectedClass)) {
+                        // Unselect player and enable them in the other team
+                        playerCard.classList.remove(selectedClass);
+                        const matchingPlayer = findMatchingPlayer(playerId, opposingTeamPlayers);
+                        matchingPlayer.classList.remove('disabled-card');
+                        selectedTeam.splice(selectedTeam.indexOf(playerId), 1);
+                    } else {
+                        // Select player and disable them in the other team
+                        playerCard.classList.add(selectedClass);
+                        const matchingPlayer = findMatchingPlayer(playerId, opposingTeamPlayers);
+                        matchingPlayer.classList.add('disabled-card');
+                        selectedTeam.push(playerId);
+                    }
+
+                    // Update hidden inputs
+                    redTeamInput.value = redTeamSelected.join(',');
+                    yellowTeamInput.value = yellowTeamSelected.join(',');
+                });
+            }
+
+            // Enable selecting and deselecting players for both teams
+            redTeamPlayers.forEach(player => toggleSelection(player, 'red'));
+            yellowTeamPlayers.forEach(player => toggleSelection(player, 'yellow'));
+        });
+    </script>
+</body>
+</html>

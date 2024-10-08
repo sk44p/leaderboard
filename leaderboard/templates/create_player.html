@@ -1,0 +1,6 @@
+<h1>Create Player</h1>
+<form method="post" enctype="multipart/form-data">  <!-- Include enctype for file uploads -->
+    {% csrf_token %}
+    {{ form.as_p }}  <!-- Render the form fields -->
+    <button type="submit">Create Player</button>
+</form>
