@@ -14,20 +14,37 @@
         }
         .selected-red {
             border: 3px solid #ff3860; /* Red Team Color */
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
         }
         .selected-yellow {
             border: 3px solid #ffdd57; /* Yellow Team Color */
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
         }
         .player-card {
-            width: 100px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 80px;  /* Smaller width for mobile */
             padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            margin: 5px;
+        }
+        .player-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         .player-avatar {
             border-radius: 50%;
             width: 48px;
             height: 48px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .scrollable-column {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
         }
         .big-button {
             padding: 15px 30px;
@@ -37,18 +54,21 @@
             padding: 10px 20px;
             font-size: 1rem;
         }
-        .centered-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
+        /* Ensure grid responsiveness */
+        @media (min-width: 768px) {
+            .scrollable-column {
+                max-height: 500px;
+            }
+            .player-card {
+                width: 100px;  /* Increase size on larger screens */
+            }
         }
     </style>
 </head>
 <body class="has-background-light">
     <section class="section">
-        <div class="container">
-            <h1 class="title has-text-centered">Start New Game</h1>
+        <div class="container is-fullhd">
+            <h1 class="title has-text-centered is-size-2">Start New Game</h1>
 
             <!-- Form for player selection and game start -->
             <form method="post" action="{% url 'new_game' %}">
@@ -58,24 +78,24 @@
                 <input type="hidden" id="yellow-team-input" name="yellow_team">
 
                 <!-- Team Selection -->
-                <div class="columns">
+                <div class="columns is-mobile">
                     <!-- Red Team Box -->
                     <div class="column">
                         <div class="box has-background-danger-light">
-                            <h2 class="title has-text-centered">Red Team</h2>
-                            <div id="red-team-players" class="columns is-multiline">
+                            <h2 class="title has-text-centered is-size-3 has-text-danger-dark">Red Team</h2>
+                            <div id="red-team-players" class="columns is-multiline scrollable-column">
                                 {% for player in players %}
-                                <div class="column is-one-quarter">
+                                <div class="column is-6-mobile is-3-tablet is-2-desktop">
                                     <div class="card player-card {% if player.selected_red %}selected-red{% endif %} {% if player.disabled_red %}disabled-card{% endif %}" data-player-id="{{ player.id }}" data-team="red">
-                                        <div class="card-content centered-content">
-                                            <figure class="image player-avatar">
+                                        <div class="card-content">
+                                            <figure class="image is-64x64">
                                                 {% if player.avatar %}
-                                                <img src="{{ player.avatar.url }}" alt="{{ player.name }}">
+                                                <img src="{{ player.avatar.url }}" alt="{{ player.name }}" class="player-avatar">
                                                 {% else %}
-                                                <img src="{% static 'images/default_avatar.png' %}" alt="{{ player.name }}">
+                                                <img src="{% static 'images/default_avatar.png' %}" alt="{{ player.name }}" class="player-avatar">
                                                 {% endif %}
                                             </figure>
-                                            <p>{{ player.name }}</p>
+                                            <p class="has-text-weight-bold">{{ player.name }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -87,20 +107,20 @@
                     <!-- Yellow Team Box -->
                     <div class="column">
                         <div class="box has-background-warning-light">
-                            <h2 class="title has-text-centered">Yellow Team</h2>
-                            <div id="yellow-team-players" class="columns is-multiline">
+                            <h2 class="title has-text-centered is-size-3 has-text-warning-dark">Yellow Team</h2>
+                            <div id="yellow-team-players" class="columns is-multiline scrollable-column">
                                 {% for player in players %}
-                                <div class="column is-one-quarter">
+                                <div class="column is-6-mobile is-3-tablet is-2-desktop">
                                     <div class="card player-card {% if player.selected_yellow %}selected-yellow{% endif %} {% if player.disabled_yellow %}disabled-card{% endif %}" data-player-id="{{ player.id }}" data-team="yellow">
-                                        <div class="card-content centered-content">
-                                            <figure class="image player-avatar">
+                                        <div class="card-content">
+                                            <figure class="image is-64x64">
                                                 {% if player.avatar %}
-                                                <img src="{{ player.avatar.url }}" alt="{{ player.name }}">
+                                                <img src="{{ player.avatar.url }}" alt="{{ player.name }}" class="player-avatar">
                                                 {% else %}
-                                                <img src="{% static 'images/default_avatar.png' %}" alt="{{ player.name }}">
+                                                <img src="{% static 'images/default_avatar.png' %}" alt="{{ player.name }}" class="player-avatar">
                                                 {% endif %}
                                             </figure>
-                                            <p>{{ player.name }}</p>
+                                            <p class="has-text-weight-bold">{{ player.name }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -111,12 +131,12 @@
                 </div>
 
                 <!-- Buttons Section -->
-                <div class="buttons has-text-centered mt-5">
+                <div class="mt-8 has-text-centered">
                     <!-- Large Start Game Button -->
-                    <button type="submit" class="button is-primary is-rounded big-button">Start Game</button>
+                    <button type="submit" class="button is-primary is-large big-button">Start Game</button>
 
                     <!-- Small Cancel Button -->
-                    <a href="javascript:history.back()" class="button is-danger is-rounded cancel-button mt-2">Cancel</a>
+                    <a href="javascript:history.back()" class="button is-danger is-large cancel-button">Cancel</a>
                 </div>
             </form>
         </div>
@@ -140,7 +160,6 @@
             function toggleSelection(playerCard, teamColor) {
                 const opposingTeamPlayers = teamColor === 'red' ? yellowTeamPlayers : redTeamPlayers;
                 const selectedTeam = teamColor === 'red' ? redTeamSelected : yellowTeamSelected;
-                const opposingTeamInput = teamColor === 'red' ? yellowTeamInput : redTeamInput;
                 const playerId = playerCard.dataset.playerId;
 
                 playerCard.addEventListener('click', function() {
