@@ -24,7 +24,8 @@ choosing the losing score (because the winning score is always 10) just helps wi
 
 you need to create a leaderboard_app/local_settings.py file with contents that looks like this:
 
-```SECRET_KEY = 'django-insecure-secret-123'
+```
+SECRET_KEY = 'django-insecure-secret-123'
 
 DATABASES = {
     'default': {
@@ -35,4 +36,5 @@ DATABASES = {
         'HOST': 'localhost'
         'PORT': '3306',
     }
-}```
+}
+```
