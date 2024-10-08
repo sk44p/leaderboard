@@ -16,11 +16,13 @@ Including another URLconf
 """
 from django.urls import path
 from django.conf.urls.static import static
+from django.contrib import admin
 from django.conf import settings  # Correct import for settings
 from leaderboard import views
 
 urlpatterns = [
     path('', views.leaderboard_view, name='leaderboard'),
+    path('admin/', admin.site.urls),
     path('create_player/', views.create_player_view, name='create_player'),
     path('new_game/', views.new_game_view, name='new_game'),
     path('complete_game/<int:game_id>/', views.complete_game_view, name='complete_game'),
