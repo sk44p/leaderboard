@@ -3,14 +3,18 @@ from leaderboard.models import Player
 
 
 class Command(BaseCommand):
-    help = 'Resets all players\' mu and sigma to default values'
+    help = 'Resets all players\' mu, sigma, and recalculates rank'
 
     def handle(self, *args, **kwargs):
         default_mu = 25.0
         default_sigma = 8.33
 
-        # Reset all players' mu and sigma values
-        Player.objects.all().update(mu=default_mu, sigma=default_sigma)
+        players = Player.objects.all()
 
-        # Print a success message
-        self.stdout.write(self.style.SUCCESS('Successfully reset mu and sigma for all players'))
+        for player in players:
+            player.mu = default_mu
+            player.sigma = default_sigma
+            player.rank = default_mu - 3 * default_sigma  # Recalculate the rank
+            player.save()
+
+        self.stdout.write(self.style.SUCCESS('Successfully reset mu, sigma, and rank for all players'))
