@@ -38,7 +38,7 @@ def player_history_view(request, player_id):
     total_points_difference = 0
 
     # Fetch matches involving the player
-    matches = Match.objects.filter(players=player)
+    matches = Match.objects.filter(players=player).order_by('-created_at')
 
     for match in matches:
         total_games += 1
