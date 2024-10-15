@@ -1,8 +1,63 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404  # Add get_object_or_404 here
 from leaderboard.models import Player, Game, Match
 from leaderboard.forms import PlayerForm
 from openskill.models import PlackettLuce
+
+
+def edit_player(request):
+    if request.method == 'POST':
+        player_id = request.POST.get('player_id')
+        player = get_object_or_404(Player, id=player_id)
+
+        # Update player name
+        player.name = request.POST.get('player_name', player.name)
+
+        # Update player avatar if a new one is uploaded
+        if 'avatar' in request.FILES:
+            player.avatar = request.FILES['avatar']
+
+        player.save()
+
+        return redirect('leaderboard')  # Redirect to the leaderboard after editing
+    else:
+        return redirect('leaderboard')
+
+
+def player_history(request, player_id):
+    player = Player.objects.get(id=player_id)
+    match_history = []
+
+    # Retrieve match history for the player
+    matches = Match.objects.filter(players=player).prefetch_related('games')
+    for match in matches:
+        for game in match.games.all():
+            # Check if the player was in the red or yellow team
+            if player in game.red_team.all():
+                opponent_team = game.yellow_team.all()
+                score = f"{game.score_red} - {game.score_yellow}"
+                result = 'Win' if game.score_red > game.score_yellow else 'Loss'
+            else:
+                opponent_team = game.red_team.all()
+                score = f"{game.score_yellow} - {game.score_red}"
+                result = 'Win' if game.score_yellow > game.score_red else 'Loss'
+
+            opponent_names = ", ".join([opponent.name for opponent in opponent_team])
+
+            match_history.append({
+                'opponent': opponent_names,
+                'result': result,
+                'score': score,
+                'played_at': game.played_at.strftime('%Y-%m-%d %H:%M')
+            })
+
+    data = {
+        'player': {'id': player.id, 'name': player.name},
+        'match_history': match_history
+    }
+    return JsonResponse(data)
+
+
 
 def leaderboard_view(request):
     players = Player.objects.all().order_by('-rank')  # Order by rank

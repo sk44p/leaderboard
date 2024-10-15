@@ -7,28 +7,29 @@
     <title>Leaderboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
     <style>
-        /* Container for the scrollable list of players */
+        /* Scrollable player list */
         .scrollable-player-list {
-            max-height: 60vh; /* Adjust the height based on viewport height */
+            max-height: 60vh;
             overflow-y: auto;
-            padding-right: 15px;
-            margin-bottom: 20px; /* Space between the list and the buttons */
+            margin-bottom: 20px;
         }
         .player-card {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
+            padding: 15px;
             margin-bottom: 15px;
-            background-color: #f5f5f5;
+            background-color: #f9f9f9;
             border-radius: 8px;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+        .player-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: #f1f1f1;
         }
         .player-avatar {
             margin-right: 15px;
-        }
-        .player-info {
-            display: flex;
-            align-items: center;
         }
         .rank-mu-container {
             text-align: right;
@@ -41,14 +42,50 @@
             font-size: 0.9rem;
         }
         .mu-positive {
-            color: #48c774; /* Green for positive change */
+            color: #48c774;
         }
         .mu-negative {
-            color: #f14668; /* Red for negative change */
+            color: #f14668;
         }
         .button-container {
             margin-top: 20px;
             text-align: center;
+        }
+        .match-history {
+            margin-top: 15px;
+        }
+        .match-card {
+            background-color: #f8f8f8;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .modal-card-head {
+            background-color: #f5f5f5;
+        }
+        .modal-card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .player-avatar-large {
+            border-radius: 50%;
+            width: 128px;
+            height: 128px;
+            object-fit: cover;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .player-card {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+            .rank-mu-container {
+                text-align: left;
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
@@ -62,8 +99,7 @@
                 <div class="box has-background-grey-lighter">
                     {% for player_data in players %}
                     <!-- Player Card -->
-                    <div class="player-card">
-                        <!-- Player Avatar and Info -->
+                    <div class="player-card" data-player-id="{{ player_data.player.id }}" onclick="openPlayerModal({{ player_data.player.id }})">
                         <div class="media-left">
                             <div class="player-info">
                                 <!-- Player Avatar -->
@@ -98,7 +134,7 @@
                 </div>
             </div>
 
-            <!-- Buttons (always visible, not scrolling) -->
+            <!-- Buttons -->
             <div class="button-container">
                 <a href="{% url 'create_player' %}" class="button is-primary is-rounded is-large">Create Player</a>
                 <a href="{% url 'new_game' %}" class="button is-info is-rounded is-large">New Game</a>
@@ -106,6 +142,113 @@
             </div>
         </div>
     </section>
+
+    <!-- Player Modal -->
+    <div class="modal" id="playerModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Player Information</p>
+                <button class="delete" aria-label="close" onclick="closePlayerModal()"></button>
+            </header>
+            <section class="modal-card-body">
+                <!-- Display Player Info -->
+                <div class="player-info-display has-text-centered">
+                    <!-- Large Avatar -->
+                    <figure class="image is-128x128 is-inline-block">
+                        <img id="player-avatar" class="player-avatar-large" src="{% static 'images/default_avatar.png' %}" alt="Player Avatar">
+                    </figure>
+                    <!-- Player Name -->
+                    <h2 id="player-name" class="title is-4 mt-2"></h2>
+                    <!-- Edit Button -->
+                    <button class="button is-info mt-3" onclick="openEditModal()">Edit Player</button>
+                </div>
+
+                <!-- Match History -->
+                <h2 class="title is-5 mt-5">Match History</h2>
+                <div id="match-history" class="match-history">
+                    <!-- Dynamically populated match history -->
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button" onclick="closePlayerModal()">Close</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Edit Player Modal (Second modal for editing) -->
+    <div class="modal" id="editPlayerModal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Edit Player</p>
+                <button class="delete" aria-label="close" onclick="closeEditModal()"></button>
+            </header>
+            <section class="modal-card-body">
+                <!-- Edit Player Form -->
+                <form method="POST" enctype="multipart/form-data" action="{% url 'edit_player' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="player_id" id="edit-modal-player-id">
+                    <div class="field">
+                        <label class="label">Player Name</label>
+                        <div class="control">
+                            <input type="text" class="input" name="player_name" id="edit-modal-player-name">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Player Avatar</label>
+                        <div class="control">
+                            <input type="file" class="input" name="avatar" id="edit-modal-avatar">
+                        </div>
+                    </div>
+                    <button type="submit" class="button is-success mt-2">Save Changes</button>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Open Player Modal
+        function openPlayerModal(playerId) {
+            document.getElementById('playerModal').classList.add('is-active');
+
+            // Make an AJAX request to get the player's match history and info
+            fetch(`/player/${playerId}/history/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('edit-modal-player-id').value = data.player.id;
+                    document.getElementById('player-name').innerText = data.player.name;
+                    document.getElementById('edit-modal-player-name').value = data.player.name;
+
+                    // Set the avatar or default avatar
+                    const avatarUrl = data.player.avatar ? data.player.avatar : "{% static 'images/default_avatar.png' %}";
+                    document.getElementById('player-avatar').src = avatarUrl;
+
+                    document.getElementById('match-history').innerHTML = data.match_history.map(match => `
+                        <div class="match-card">
+                            <p><strong>Opponent:</strong> ${match.opponent}</p>
+                            <p><strong>Result:</strong> ${match.result}</p>
+                            <p><strong>Score:</strong> ${match.score}</p>
+                            <p><strong>Played At:</strong> ${match.played_at}</p>
+                        </div>
+                    `).join('');
+                });
+        }
+
+        // Close Player Modal
+        function closePlayerModal() {
+            document.getElementById('playerModal').classList.remove('is-active');
+        }
+
+        // Open Edit Modal
+        function openEditModal() {
+            document.getElementById('editPlayerModal').classList.add('is-active');
+        }
+
+        // Close Edit Modal
+        function closeEditModal() {
+            document.getElementById('editPlayerModal').classList.remove('is-active');
+        }
+    </script>
 </body>
 </html>
-

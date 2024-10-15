@@ -28,5 +28,7 @@ urlpatterns = [
     path('complete_game/<int:game_id>/', views.complete_game_view, name='complete_game'),
     path('game_history/', views.game_history_view, name='game_history'),
     path('set-token/', views.set_auth_token, name='set_auth_token'),
+    path('player/<int:player_id>/history/', views.player_history, name='player_history'),  # For match history
+    path('edit_player/', views.edit_player, name='edit_player'),  # Add this line
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
