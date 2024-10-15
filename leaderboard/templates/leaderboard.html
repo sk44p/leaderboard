@@ -19,14 +19,13 @@
             align-items: center;
             padding: 15px;
             margin-bottom: 15px;
-            background-color: #f9f9f9;
+            background-color: #f5f5f5;
             border-radius: 8px;
             cursor: pointer;
-            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+            transition: box-shadow 0.3s ease;
         }
         .player-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            background-color: #f1f1f1;
         }
         .player-avatar {
             margin-right: 15px;
@@ -54,13 +53,6 @@
         .match-history {
             margin-top: 15px;
         }
-        .match-card {
-            background-color: #f8f8f8;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
         .modal-card-head {
             background-color: #f5f5f5;
         }
@@ -75,18 +67,46 @@
             object-fit: cover;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+        .table-container {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .table {
+            border-radius: 8px;
+            overflow: hidden; /* Ensure that corners are rounded */
+        }
+
+        .table th {
+            background-color: #e6e6fa; /* Light purple background for headers */
+            font-weight: bold;
+            text-align: center; /* Center text in headers */
+        }
+
+        .table td {
+            background-color: #ffffff; /* White background for data cells */
+            text-align: center; /* Center text for all data cells */
+        }
+
+        .match-card {
+            background-color: #f8f8f8;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .match-card p {
+            margin: 0; /* Remove margin for match card paragraphs for a cleaner look */
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
-            .player-card {
-                flex-direction: column;
-                align-items: flex-start;
-                text-align: left;
-            }
-            .rank-mu-container {
-                text-align: left;
-                margin-top: 10px;
+            .table {
+                font-size: 0.9rem; /* Smaller text size on mobile */
             }
         }
+
     </style>
 </head>
 <body class="has-background-light">
@@ -164,6 +184,29 @@
                     <button class="button is-info mt-3" onclick="openEditModal()">Edit Player</button>
                 </div>
 
+                <!-- Match Summary -->
+                <h2 class="title is-5 mt-5">Match Summary</h2>
+                <div class="table-container has-text-centered">
+                    <table class="table is-striped is-bordered is-hoverable is-fullwidth">
+                        <thead>
+                            <tr>
+                                <th>Matches Played</th>
+                                <th>Games Won</th>
+                                <th>Games Lost</th>
+                                <th>Total Pts Diff.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="total-games" class="has-text-centered"></td>
+                                <td id="total-wins" class="has-text-centered"></td>
+                                <td id="total-losses" class="has-text-centered"></td>
+                                <td id="total-points-difference" class="has-text-centered"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
                 <!-- Match History -->
                 <h2 class="title is-5 mt-5">Match History</h2>
                 <div id="match-history" class="match-history">
@@ -223,6 +266,12 @@
                     // Set the avatar or default avatar
                     const avatarUrl = data.player.avatar ? data.player.avatar : "{% static 'images/default_avatar.png' %}";
                     document.getElementById('player-avatar').src = avatarUrl;
+
+                    // Update match summary
+                    document.getElementById('total-games').innerText = data.total_games;
+                    document.getElementById('total-wins').innerText = data.total_wins;
+                    document.getElementById('total-losses').innerText = data.total_losses;
+                    document.getElementById('total-points-difference').innerText = data.total_points_difference;
 
                     document.getElementById('match-history').innerHTML = data.match_history.map(match => `
                         <div class="match-card">

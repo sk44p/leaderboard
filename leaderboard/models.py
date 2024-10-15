@@ -39,6 +39,7 @@ class Game(models.Model):
     yellow_team_mu_change = models.JSONField(null=True, blank=True)
 
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='games')
+    winner = models.CharField(max_length=10, choices=[('red', 'Red'), ('yellow', 'Yellow')], blank=True, null=True)
 
     def __str__(self):
         return f"Game {self.id} - Red Team vs Yellow Team"

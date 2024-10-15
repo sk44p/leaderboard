@@ -24,39 +24,83 @@ def edit_player(request):
         return redirect('leaderboard')
 
 
-def player_history(request, player_id):
-    player = Player.objects.get(id=player_id)
+from django.http import JsonResponse
+
+
+def player_history_view(request, player_id):
+    player = get_object_or_404(Player, id=player_id)
+
+    # Assuming you have a method to retrieve match history for the player
     match_history = []
+    total_games = 0
+    total_wins = 0
+    total_losses = 0
+    total_points_difference = 0
 
-    # Retrieve match history for the player
-    matches = Match.objects.filter(players=player).prefetch_related('games')
+    # Fetch matches involving the player
+    matches = Match.objects.filter(players=player)
+
     for match in matches:
+        total_games += 1
+        game_results = []
+
         for game in match.games.all():
-            # Check if the player was in the red or yellow team
             if player in game.red_team.all():
-                opponent_team = game.yellow_team.all()
-                score = f"{game.score_red} - {game.score_yellow}"
-                result = 'Win' if game.score_red > game.score_yellow else 'Loss'
-            else:
-                opponent_team = game.red_team.all()
-                score = f"{game.score_yellow} - {game.score_red}"
-                result = 'Win' if game.score_yellow > game.score_red else 'Loss'
+                result = 'Won' if game.score_red > game.score_yellow else 'Lost'
+                points_diff = game.score_red - game.score_yellow
+                total_points_difference += points_diff
+                if result == 'Won':
+                    total_wins += 1
+                else:
+                    total_losses += 1
 
-            opponent_names = ", ".join([opponent.name for opponent in opponent_team])
+                # Store opponent's name (you might want to adjust this logic)
+                opponents = game.yellow_team.all()
+                opponent_names = ', '.join([opponent.name for opponent in opponents])
 
-            match_history.append({
-                'opponent': opponent_names,
-                'result': result,
-                'score': score,
-                'played_at': game.played_at.strftime('%Y-%m-%d %H:%M')
-            })
+                game_results.append({
+                    'opponent': opponent_names,
+                    'result': result,
+                    'score': f"{game.score_red} - {game.score_yellow}",
+                    'played_at': game.played_at,
+                })
 
-    data = {
-        'player': {'id': player.id, 'name': player.name},
-        'match_history': match_history
+            elif player in game.yellow_team.all():
+                result = 'Won' if game.score_yellow > game.score_red else 'Lost'
+                points_diff = game.score_yellow - game.score_red
+                total_points_difference += points_diff
+                if result == 'Won':
+                    total_wins += 1
+                else:
+                    total_losses += 1
+
+                # Store opponent's name (you might want to adjust this logic)
+                opponents = game.red_team.all()
+                opponent_names = ', '.join([opponent.name for opponent in opponents])
+
+                game_results.append({
+                    'opponent': opponent_names,
+                    'result': result,
+                    'score': f"{game.score_yellow} - {game.score_red}",
+                    'played_at': game.played_at,
+                })
+
+        match_history.extend(game_results)
+
+    context = {
+        'player': {
+            'id': player.id,
+            'name': player.name,
+            'avatar': player.avatar.url if player.avatar else None,
+        },
+        'match_history': match_history,
+        'total_games': total_games,
+        'total_wins': total_wins,
+        'total_losses': total_losses,
+        'total_points_difference': total_points_difference,
     }
-    return JsonResponse(data)
 
+    return JsonResponse(context)
 
 
 def leaderboard_view(request):
@@ -94,6 +138,7 @@ def leaderboard_view(request):
         })
 
     return render(request, 'leaderboard.html', {'players': leaderboard_data})
+
 
 def create_player_view(request):
     if request.method == 'POST':
@@ -171,6 +216,7 @@ def complete_game_view(request, game_id):
             game.score_yellow = 10
 
         # Mark the game as completed
+        game.winner = winner
         game.is_completed = True
 
         # Example:
