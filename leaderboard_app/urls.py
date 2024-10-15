@@ -30,5 +30,6 @@ urlpatterns = [
     path('set-token/', views.set_auth_token, name='set_auth_token'),
     path('player/<int:player_id>/history/', views.player_history_view, name='player_history'),
     path('edit_player/', views.edit_player, name='edit_player'),  # Add this line
+    path('player_distribution/', views.player_distribution_view, name='player_distribution'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

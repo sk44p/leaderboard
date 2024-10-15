@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Distribution</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+    <style>
+        .chart {
+            max-width: 800px; /* You can adjust the size */
+            margin: 0 auto; /* Center the graph */
+        }
+    </style>
+</head>
+<body class="has-background-light">
+    <section class="section">
+        <div class="container">
+            <h1 class="title has-text-centered">Player Distribution</h1>
+            <div class="has-text-centered">
+                <img src="{{ image }}" class="chart">
+            </div>
+        </div>
+    </section>
+</body>
+</html>

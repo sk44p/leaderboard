@@ -4,6 +4,48 @@ from leaderboard.models import Player, Game, Match
 from leaderboard.forms import PlayerForm
 from openskill.models import PlackettLuce
 
+import numpy as np
+import matplotlib.pyplot as plt
+import io
+import base64
+
+
+def player_distribution_view(request):
+    players = Player.objects.all()
+
+    # Create the x values for the graph
+    x = np.linspace(-20, 80, 100)  # Adjust range as necessary
+    plt.figure()
+
+    # Define a color palette
+    colors = plt.cm.viridis(np.linspace(0, 1, len(players)))  # Generate a colormap
+
+    for player, color in zip(players, colors):
+        mu = player.mu
+        sigma = player.sigma
+
+        # Create the normal distribution curve
+        y = (1 / (sigma * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - mu) / sigma) ** 2)
+
+        # Plot each player's distribution curve
+        plt.plot(x, y, label=player.name, color=color)
+
+    # Adding details to the graph
+    plt.title('Player Skill Level Distributions')
+    plt.xlabel('Skill Level')
+    plt.ylabel('Density')
+    plt.grid()
+    plt.legend(loc='upper right', fontsize='small')
+
+    # Save the figure to a byte array
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()  # Close the plot to avoid display issues
+    buf.seek(0)
+    image_png = base64.b64encode(buf.read()).decode('utf-8')
+
+    return render(request, 'player_distribution.html', {'image': f'data:image/png;base64,{image_png}'})
+
 
 def edit_player(request):
     if request.method == 'POST':
