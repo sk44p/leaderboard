@@ -24,6 +24,10 @@
             cursor: pointer;
             transition: box-shadow 0.3s ease;
         }
+        .player-info {
+            flex-grow: 1; /* This will allow the name to be next to the avatar */
+            margin-left: 15px; /* Add some space between avatar and name */
+        }
         .player-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
@@ -119,28 +123,19 @@
                 <div class="box has-background-grey-lighter">
                     {% for player_data in players %}
                     <!-- Player Card -->
-                    <div class="player-card" data-player-id="{{ player_data.player.id }}" onclick="openPlayerModal({{ player_data.player.id }})">
+                   <div class="player-card" data-player-id="{{ player_data.player.id }}" onclick="openPlayerModal({{ player_data.player.id }})">
                         <div class="media-left">
-                            <div class="player-info">
-                                <!-- Player Avatar -->
+                            <figure class="image is-64x64 player-avatar">
                                 {% if player_data.player.avatar %}
-                                <figure class="image is-64x64 player-avatar">
-                                    <img src="{{ player_data.player.avatar.url }}" alt="{{ player_data.player.name }}'s avatar" class="is-rounded">
-                                </figure>
+                                <img src="{{ player_data.player.avatar.url }}" alt="{{ player_data.player.name }}'s avatar" class="is-rounded">
                                 {% else %}
-                                <figure class="image is-64x64 player-avatar">
-                                    <img src="{% static 'images/default_avatar.png' %}" alt="Default avatar" class="is-rounded">
-                                </figure>
+                                <img src="{% static 'images/default_avatar.png' %}" alt="Default avatar" class="is-rounded">
                                 {% endif %}
-
-                                <!-- Player Name -->
-                                <div>
-                                    <p class="title is-4 player-name">{{ player_data.player.name }}</p>
-                                </div>
-                            </div>
+                            </figure>
                         </div>
-
-                        <!-- Rank and Mu Change (aligned to the right) -->
+                        <div class="player-info">
+                            <p class="title is-4 player-name">{{ player_data.player.name }}</p>
+                        </div>
                         <div class="rank-mu-container">
                             <p class="rank">Rank: {{ player_data.player.rank|floatformat:2 }}</p>
                             {% if player_data.mu_change is not None %}
