@@ -339,9 +339,6 @@ def complete_game_view(request, game_id):
         if yellow_logos:
             game.yellow_team_logo = f"images/yellow/{random.choice(yellow_logos)}"
 
-        print("red logo: ", game.red_team_logo)
-        print("yellow logo: ", game.yellow_team_logo)
-
         # Save the game
         game.save()
 
