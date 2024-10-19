@@ -1,5 +1,7 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404  # Add get_object_or_404 here
+from django.conf import settings
+
 from leaderboard.models import Player, Game, Match
 from leaderboard.forms import PlayerForm
 from openskill.models import PlackettLuce
@@ -373,5 +375,5 @@ def game_history_view(request):
 
 def set_auth_token(request):
     response = HttpResponse("Token set successfully.")
-    response.set_cookie('auth_token', '!dTtjQpGDnWG3P9D4oLH8NAF#WM4fyunG%*Z7^kqc&7bpJwPx&6BuHm#pw!5rAjh8UgAYKzR4zXu%a$$t4$hvd9ZW', max_age=60*60*24*30*24)  # Expires in 30 days
+    response.set_cookie('auth_token', settings.AUTH_TOKEN_SECRET, max_age=60*60*24*30*24)  # Expires in 30 days
     return response
