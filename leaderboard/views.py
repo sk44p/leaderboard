@@ -5,11 +5,11 @@ from django.conf import settings
 from leaderboard.models import Player, Game, Match
 from leaderboard.forms import PlayerForm
 from openskill.models import PlackettLuce
-
+import os
+import random
 import numpy as np
 import plotly.graph_objs as go
 import plotly.offline as pyo
-
 
 def player_distribution_view(request):
     players = Player.objects.all()
@@ -326,6 +326,22 @@ def complete_game_view(request, game_id):
         game.red_team_mu_change = red_team_mu_change  # Store the mu changes for the red team
         game.yellow_team_mu_change = yellow_team_mu_change  # Store the mu changes for the yellow team
         game.is_completed = True
+
+        # Assign random logos from static folders
+        red_logos_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'red')
+        yellow_logos_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'yellow')
+
+        red_logos = [f for f in os.listdir(red_logos_path) if f.endswith('.png')]
+        yellow_logos = [f for f in os.listdir(yellow_logos_path) if f.endswith('.png')]
+
+        if red_logos:
+            game.red_team_logo = f"images/red/{random.choice(red_logos)}"
+        if yellow_logos:
+            game.yellow_team_logo = f"images/yellow/{random.choice(yellow_logos)}"
+
+        print("red logo: ", game.red_team_logo)
+        print("yellow logo: ", game.yellow_team_logo)
+
         # Save the game
         game.save()
 
@@ -372,6 +388,36 @@ def game_history_view(request):
         })
 
     return render(request, 'game_history.html', {'matches': match_data})
+
+
+def static_leaderboard_view(request):
+    players = Player.objects.all().order_by('-rank')  # Order players by rank
+    last_games = Game.objects.filter(is_completed=True).order_by('-played_at')[:10]  # Get last 10 completed games
+
+    # Prepare data for the game summary
+    game_summary = []
+    for game in last_games:
+        if random.choice([True, False]):
+            game_summary.append({
+                'left_team': [player.name for player in game.red_team.all()],
+                'left_team_logo': game.red_team_logo,
+                'right_team': [player.name for player in game.yellow_team.all()],
+                'right_team_logo': game.yellow_team_logo,
+                'score': f"{game.score_red} - {game.score_yellow}",
+                'played_at': game.played_at.strftime('%A %d %b %Y'),  # Format date here
+            })
+        else:
+            game_summary.append({
+                'left_team': [player.name for player in game.yellow_team.all()],
+                'left_team_logo': game.yellow_team_logo,
+                'right_team': [player.name for player in game.red_team.all()],
+                'right_team_logo': game.red_team_logo,
+                'score': f"{game.score_yellow} - {game.score_red}",
+                'played_at': game.played_at.strftime('%A %d %b %Y'),  # Format date here
+            })
+
+    return render(request, 'static_leaderboard.html', {'players': players, 'game_summary': game_summary})
+
 
 def set_auth_token(request):
     response = HttpResponse("Token set successfully.")

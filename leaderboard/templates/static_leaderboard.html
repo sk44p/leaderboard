@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Static Leaderboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('{% static "images/background.webp" %}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+        .box {
+            background-color: rgba(200, 210, 220, 0.5);
+        }
+        .title-container {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(245, 245, 245, 0.4);
+        }
+        .content {
+            display: flex;
+            flex: 1;
+        }
+        .leaderboard {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: rgba(245, 245, 245, 0.4);
+        }
+        .game-summary {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: rgba(245, 245, 245, 0.4);
+        }
+        .player-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: rgba(245, 245, 245, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: box-shadow 0.3s ease;
+        }
+        .game-result-card {
+            background-color: rgba(200, 210, 220, 0.5);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .match-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+        .team {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .match-details {
+            text-align: center;
+            margin: 0 20px;
+        }
+        .score-container {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .final-score {
+            font-size: 3rem;
+            font-weight: bold;
+            display: inline;
+            margin: 0 10px;
+        }
+        .score-ft {
+            display: inline;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title-container">
+        <h1 class="title">Leaderboard</h1>
+    </div>
+
+    <div class="content">
+        <div class="leaderboard">
+            <div class="box">
+                {% for player in players %}
+                <!-- Player Card -->
+                <div class="player-card">
+                    <div class="media-left">
+                        <figure class="image is-64x64 player-avatar">
+                            {% if player.avatar %}
+                            <img alt="{{ player.name }}'s avatar" class="is-rounded" src="{{ player.avatar.url }}">
+                            {% else %}
+                            <img alt="Default avatar" class="is-rounded" src="{% static 'images/default_avatar.png' %}">
+                            {% endif %}
+                        </figure>
+                    </div>
+                    <div class="player-info">
+                        <p class="title is-4 player-name">{{ player.name }}</p>
+                    </div>
+                    <div class="rank-mu-container">
+                        <p class="rank">Rank: {{ player.rank|floatformat:2 }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="game-summary">
+            <div class="columns is-multiline">
+                {% for game in game_summary %}
+                <div class="column is-half">
+                    <div class="game-result-card">
+                        <div class="container">
+                            <div class="match-info">
+                                <div class="team left-team">
+                                    <figure class="image is-64x64">
+                                        <img src="{% static game.left_team_logo %}">
+                                    </figure>
+                                    <div class="player-names">
+                                        <p>{{ game.left_team|join:"<br>" }}</p>  <!-- Each player name on a new line -->
+                                    </div>
+                                </div>
+
+                                <div class="match-details">
+                                    <h4 class="date">{{ game.played_at }}</h4>
+<!--                                    <p class="location">Irdeto Foosball Table, Sherwood Kitchen, Technology Building</p>-->
+                                    <div class="score-container">
+                                <div class="score">
+                                    <h2 class="final-score">{{ game.score }}</h2>
+                                </div>
+                            </div>
+                                </div>
+
+                                <div class="team right-team">
+                                    <figure class="image is-64x64">
+                                        <img src="{% static game.right_team_logo %}">
+                                    </figure>
+                                    <div class="player-names">
+                                        <p>{{ game.right_team|join:"<br>" }}</p>  <!-- Each player name on a new line -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

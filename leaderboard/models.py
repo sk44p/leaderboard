@@ -27,6 +27,8 @@ class Match(models.Model):
 class Game(models.Model):
     red_team = models.ManyToManyField(Player, related_name='red_team')  # Red team can have 1 or 2 players
     yellow_team = models.ManyToManyField(Player, related_name='yellow_team')  # Yellow team can have 1 or 2 players
+    red_team_logo = models.URLField(blank=True, null=True)  # URL for red team logo
+    yellow_team_logo = models.URLField(blank=True, null=True)  # URL for yellow team logo
     score_red = models.IntegerField(default=0)
     score_yellow = models.IntegerField(default=0)
     is_completed = models.BooleanField(default=False)

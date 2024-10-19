@@ -31,5 +31,6 @@ urlpatterns = [
     path('player/<int:player_id>/history/', views.player_history_view, name='player_history'),
     path('edit_player/', views.edit_player, name='edit_player'),  # Add this line
     path('player_distribution/', views.player_distribution_view, name='player_distribution'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('static-leaderboard/', views.static_leaderboard_view, name='static_leaderboard'),
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
