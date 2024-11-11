@@ -272,9 +272,7 @@ def complete_game_view(request, game_id):
         game.winner = winner
         game.is_completed = True
 
-        # Example:
-        # game.red_team_mu_change = [some logic to calculate mu changes]
-        # game.yellow_team_mu_change = [some logic to calculate mu changes]
+        # Use the PlackettLuce model to calculate new ratings
         model = PlackettLuce()  # Use the PlackettLuce model
 
         # Create PlackettLuceRating objects for each player
@@ -327,17 +325,22 @@ def complete_game_view(request, game_id):
         game.yellow_team_mu_change = yellow_team_mu_change  # Store the mu changes for the yellow team
         game.is_completed = True
 
-        # Assign random logos from static folders
-        red_logos_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'red')
-        yellow_logos_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'yellow')
+        # Assign logos or player avatar based on team size
+        if len(red_team) == 1:
+            game.red_team_logo = red_team[0].avatar.url  # Use the avatar of the single red team player
+        else:
+            red_logos_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'red')
+            red_logos = [f for f in os.listdir(red_logos_path) if f.endswith('.png')]
+            if red_logos:
+                game.red_team_logo = f"images/red/{random.choice(red_logos)}"
 
-        red_logos = [f for f in os.listdir(red_logos_path) if f.endswith('.png')]
-        yellow_logos = [f for f in os.listdir(yellow_logos_path) if f.endswith('.png')]
-
-        if red_logos:
-            game.red_team_logo = f"images/red/{random.choice(red_logos)}"
-        if yellow_logos:
-            game.yellow_team_logo = f"images/yellow/{random.choice(yellow_logos)}"
+        if len(yellow_team) == 1:
+            game.yellow_team_logo = yellow_team[0].avatar.url  # Use the avatar of the single yellow team player
+        else:
+            yellow_logos_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'yellow')
+            yellow_logos = [f for f in os.listdir(yellow_logos_path) if f.endswith('.png')]
+            if yellow_logos:
+                game.yellow_team_logo = f"images/yellow/{random.choice(yellow_logos)}"
 
         # Save the game
         game.save()
@@ -361,6 +364,7 @@ def complete_game_view(request, game_id):
         'red_team': red_team,
         'yellow_team': yellow_team,
     })
+
 
 def game_history_view(request):
     matches = Match.objects.prefetch_related('games').order_by('-created_at')  # Get matches in descending order
