@@ -88,7 +88,7 @@
                                 <div class="column is-6-mobile is-3-tablet is-2-desktop">
                                     <div class="card player-card {% if player.selected_red %}selected-red{% endif %} {% if player.disabled_red %}disabled-card{% endif %}" data-player-id="{{ player.id }}" data-team="red">
                                         <div class="card-content">
-                                            <figure class="image is-64x64">
+                                            <figure class="image is-48x48">
                                                 {% if player.avatar %}
                                                 <img src="{{ player.avatar.url }}" alt="{{ player.name }}" class="player-avatar">
                                                 {% else %}
@@ -113,7 +113,7 @@
                                 <div class="column is-6-mobile is-3-tablet is-2-desktop">
                                     <div class="card player-card {% if player.selected_yellow %}selected-yellow{% endif %} {% if player.disabled_yellow %}disabled-card{% endif %}" data-player-id="{{ player.id }}" data-team="yellow">
                                         <div class="card-content">
-                                            <figure class="image is-64x64">
+                                            <figure class="image is-48x48">
                                                 {% if player.avatar %}
                                                 <img src="{{ player.avatar.url }}" alt="{{ player.name }}" class="player-avatar">
                                                 {% else %}
