@@ -104,6 +104,12 @@
             display: inline;
             margin: 0 10px;
         }
+        .player-avatar img {
+            width: 64px; /* Fixed width */
+            height: 64px; /* Fixed height */
+            border-radius: 50%; /* Make the image circular */
+            object-fit: cover; /* Ensure the image covers the circular area without distortion */
+        }
     </style>
 </head>
 
@@ -121,9 +127,9 @@
                     <div class="media-left">
                         <figure class="image is-64x64 player-avatar">
                             {% if player.avatar %}
-                            <img alt="{{ player.name }}'s avatar" class="is-rounded" src="{{ player.avatar.url }}">
+                            <img alt="{{ player.name }}'s avatar" class="is-rounded player-avatar" src="{{ player.avatar.url }}">
                             {% else %}
-                            <img alt="Default avatar" class="is-rounded" src="{% static 'images/default_avatar.png' %}">
+                            <img alt="Default avatar" class="is-rounded player-avatar" src="{% static 'images/default_avatar.png' %}">
                             {% endif %}
                         </figure>
                     </div>
