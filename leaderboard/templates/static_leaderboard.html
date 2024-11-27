@@ -153,7 +153,7 @@
                             <div class="match-info">
                                 <div class="team left-team">
                                     <figure class="image is-64x64">
-                                        <img src="{% static game.left_team_logo %}">
+                                        <img src="{{ game.left_team_logo }}">
                                     </figure>
                                     <div class="player-names">
                                         <p>{{ game.left_team|join:"<br>" }}</p>  <!-- Each player name on a new line -->
@@ -172,7 +172,7 @@
 
                                 <div class="team right-team">
                                     <figure class="image is-64x64">
-                                        <img src="{% static game.right_team_logo %}">
+                                        <img src="{{ game.right_team_logo }}">
                                     </figure>
                                     <div class="player-names">
                                         <p>{{ game.right_team|join:"<br>" }}</p>  <!-- Each player name on a new line -->
