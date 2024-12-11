@@ -326,7 +326,7 @@ def complete_game_view(request, game_id):
         game.is_completed = True
 
         # Assign logos or player avatar based on team size
-        if len(red_team) == 1:
+        if len(red_team) == 1 and red_team[0].avatar:
             game.red_team_logo = red_team[0].avatar.url  # Use the avatar of the single red team player
         else:
             red_logos_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'red')
@@ -334,7 +334,7 @@ def complete_game_view(request, game_id):
             if red_logos:
                 game.red_team_logo = f"images/red/{random.choice(red_logos)}"
 
-        if len(yellow_team) == 1:
+        if len(yellow_team) == 1 and yellow_team[0].avatar:
             game.yellow_team_logo = yellow_team[0].avatar.url  # Use the avatar of the single yellow team player
         else:
             yellow_logos_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'yellow')

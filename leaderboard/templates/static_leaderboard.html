@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -153,7 +154,11 @@
                             <div class="match-info">
                                 <div class="team left-team">
                                     <figure class="image is-64x64">
-                                        <img src="{{ game.left_team_logo }}">
+                                    {% if game.left_team_logo|is_media_path %}
+                                        <img src="{{ game.left_team_logo }}" alt="Left Team Logo">
+                                    {% else %}
+                                        <img src="{% static game.left_team_logo %}" alt="Left Team Logo">
+                                    {% endif %}
                                     </figure>
                                     <div class="player-names">
                                         <p>{{ game.left_team|join:"<br>" }}</p>  <!-- Each player name on a new line -->
@@ -172,7 +177,11 @@
 
                                 <div class="team right-team">
                                     <figure class="image is-64x64">
-                                        <img src="{{ game.right_team_logo }}">
+                                    {% if game.right_team_logo|is_media_path %}
+                                        <img src="{{ game.right_team_logo }}" alt="Right Team Logo">
+                                    {% else %}
+                                        <img src="{% static game.right_team_logo %}" alt="Right Team Logo">
+                                    {% endif %}
                                     </figure>
                                     <div class="player-names">
                                         <p>{{ game.right_team|join:"<br>" }}</p>  <!-- Each player name on a new line -->
