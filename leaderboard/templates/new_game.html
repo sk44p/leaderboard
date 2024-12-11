@@ -34,7 +34,7 @@
             transform: scale(1.05);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        .player-avatar {
+        .player-avatar img {
             border-radius: 50%;
             width: 48px;
             height: 48px;
@@ -88,11 +88,11 @@
                                 <div class="column is-6-mobile is-3-tablet is-2-desktop">
                                     <div class="card player-card {% if player.selected_red %}selected-red{% endif %} {% if player.disabled_red %}disabled-card{% endif %}" data-player-id="{{ player.id }}" data-team="red">
                                         <div class="card-content">
-                                            <figure class="image is-48x48">
+                                            <figure class="image is-48x48 player-avatar is-inline-block">
                                                 {% if player.avatar %}
-                                                <img src="{{ player.avatar.url }}" alt="{{ player.name }}" class="player-avatar">
+                                                <img src="{{ player.avatar.url }}" alt="{{ player.name }}">
                                                 {% else %}
-                                                <img src="{% static 'images/default_avatar.png' %}" alt="{{ player.name }}" class="player-avatar">
+                                                <img src="{% static 'images/default_avatar.png' %}" alt="{{ player.name }}">
                                                 {% endif %}
                                             </figure>
                                             <p class="has-text-weight-bold">{{ player.name }}</p>
@@ -112,12 +112,12 @@
                                 {% for player in players %}
                                 <div class="column is-6-mobile is-3-tablet is-2-desktop">
                                     <div class="card player-card {% if player.selected_yellow %}selected-yellow{% endif %} {% if player.disabled_yellow %}disabled-card{% endif %}" data-player-id="{{ player.id }}" data-team="yellow">
-                                        <div class="card-content">
-                                            <figure class="image is-48x48">
+                                        <div class="card-content is-centered">
+                                            <figure class="image is-48x48 player-avatar is-inline-block">
                                                 {% if player.avatar %}
-                                                <img src="{{ player.avatar.url }}" alt="{{ player.name }}" class="player-avatar">
+                                                <img src="{{ player.avatar.url }}" alt="{{ player.name }}">
                                                 {% else %}
-                                                <img src="{% static 'images/default_avatar.png' %}" alt="{{ player.name }}" class="player-avatar">
+                                                <img src="{% static 'images/default_avatar.png' %}" alt="{{ player.name }}">
                                                 {% endif %}
                                             </figure>
                                             <p class="has-text-weight-bold">{{ player.name }}</p>

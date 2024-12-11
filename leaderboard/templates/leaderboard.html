@@ -31,10 +31,11 @@
         .player-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        .player-avatar {
-            margin-right: 15px;
-            border-radius: 50%;
-            object-fit: cover;
+       .player-avatar img {
+            width: 64px; /* Fixed width */
+            height: 64px; /* Fixed height */
+            border-radius: 50%; /* Make the image circular */
+            object-fit: cover; /* Ensure the image covers the circular area without distortion */
         }
         .rank-mu-container {
             text-align: right;
@@ -66,7 +67,7 @@
             font-size: 1.5rem;
             font-weight: bold;
         }
-        .player-avatar-large {
+        .player-avatar-large img {
             border-radius: 50%;
             width: 128px;
             height: 128px;
@@ -129,9 +130,9 @@
                         <div class="media-left">
                             <figure class="image is-64x64 player-avatar">
                                 {% if player_data.player.avatar %}
-                                <img src="{{ player_data.player.avatar.url }}" alt="{{ player_data.player.name }}'s avatar" class="is-rounded">
+                                <img src="{{ player_data.player.avatar.url }}" alt="{{ player_data.player.name }}'s avatar">
                                 {% else %}
-                                <img src="{% static 'images/default_avatar.png' %}" alt="Default avatar" class="is-rounded">
+                                <img src="{% static 'images/default_avatar.png' %}" alt="Default avatar">
                                 {% endif %}
                             </figure>
                         </div>
@@ -172,8 +173,8 @@
                 <!-- Display Player Info -->
                 <div class="player-info-display has-text-centered">
                     <!-- Large Avatar -->
-                    <figure class="image is-128x128 is-inline-block">
-                        <img id="player-avatar" class="player-avatar-large" src="{% static 'images/default_avatar.png' %}" alt="Player Avatar">
+                    <figure class="image is-128x128 is-inline-block player-avatar-large">
+                        <img id="player-avatar" class="is-rounded" src="{% static 'images/default_avatar.png' %}" alt="Player Avatar">
                     </figure>
                     <!-- Player Name -->
                     <h2 id="player-name" class="title is-4 mt-2"></h2>
