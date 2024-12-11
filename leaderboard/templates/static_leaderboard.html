@@ -153,12 +153,13 @@
                         <div class="container">
                             <div class="match-info">
                                 <div class="team left-team">
+                                {% if game.left_team_logo|is_media_path %}
+                                    <figure class="image is-64x64 player-avatar">
+                                        <img src="{{ game.left_team_logo }}" class="is-rounded player-avatar" alt="Left Team Logo">
+                                {% else %}
                                     <figure class="image is-64x64">
-                                    {% if game.left_team_logo|is_media_path %}
-                                        <img src="{{ game.left_team_logo }}" alt="Left Team Logo">
-                                    {% else %}
                                         <img src="{% static game.left_team_logo %}" alt="Left Team Logo">
-                                    {% endif %}
+                                {% endif %}
                                     </figure>
                                     <div class="player-names">
                                         <p>{{ game.left_team|join:"<br>" }}</p>  <!-- Each player name on a new line -->
@@ -176,12 +177,13 @@
                                 </div>
 
                                 <div class="team right-team">
+                                {% if game.right_team_logo|is_media_path %}
+                                    <figure class="image is-64x64 player-avatar">
+                                        <img src="{{ game.right_team_logo }}" class="is-rounded player-avatar" alt="Right Team Logo">
+                                {% else %}
                                     <figure class="image is-64x64">
-                                    {% if game.right_team_logo|is_media_path %}
-                                        <img src="{{ game.right_team_logo }}" alt="Right Team Logo">
-                                    {% else %}
                                         <img src="{% static game.right_team_logo %}" alt="Right Team Logo">
-                                    {% endif %}
+                                {% endif %}
                                     </figure>
                                     <div class="player-names">
                                         <p>{{ game.right_team|join:"<br>" }}</p>  <!-- Each player name on a new line -->
